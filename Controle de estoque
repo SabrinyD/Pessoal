@@ -1,0 +1,97 @@
+import pandas as pd
+
+colunas = ['Quantidade', 'Preço']
+estoque = pd.DataFrame(columns=colunas)
+
+def cadastrar_produto():
+    global estoque
+    nome = input("Digite o nome do produto: ").strip().title()
+
+    if nome in estoque.index:
+        print("Produto já cadastrado!")
+        return
+
+    try:
+        quantidade = int(input("Digite a quantidade: "))
+        if quantidade < 0:
+            print("Quantidade não pode ser menor que zero!")
+            return
+
+        preco = float(input("Digite o preço: "))
+        if preco < 0:
+            print("Preço não pode ser negativo!")
+            return
+
+        estoque.loc[nome] = [quantidade, preco]
+        print(f"Produto '{nome}' cadastrado com sucesso!")
+
+    except ValueError:
+        print("Valor inválido! Digite números válidos.")
+
+def atualizar_estoque():
+    global estoque
+    nome = input("Digite o nome do produto: ").strip().title()
+
+    if nome not in estoque.index:
+        print("Produto não encontrado!")
+        return
+
+    try:
+        quantidade = int(input("Digite a quantidade a adicionar (use '-' para remover): "))
+        nova_quantidade = estoque.at[nome, 'Quantidade'] + quantidade
+
+        if nova_quantidade < 0:
+            print("Quantidade não pode ser negativa!")
+            return
+
+        estoque.at[nome, 'Quantidade'] = nova_quantidade
+        print(f"Estoque do produto '{nome}' atualizado!")
+
+    except ValueError:
+        print("Valor inválido! Digite um número válido.")
+
+def consultar_produto():
+    global estoque
+    nome = input("Digite o nome do produto: ").strip().title()
+
+    if nome in estoque.index:
+        produto = estoque.loc[nome]
+        print(f"\nProduto: {nome}\nQuantidade: {produto['Quantidade']}\nPreço: R${produto['Preço']:.2f}")
+    else:
+        print("Produto não encontrado!")
+
+def valor_total_estoque():
+    global estoque
+    estoque['Total'] = estoque['Quantidade'] * estoque['Preço']
+    total_geral = estoque['Total'].sum()
+
+    print("\nResumo do Estoque:")
+    print(estoque[['Quantidade', 'Preço', 'Total']])
+    print(f"\nValor total do estoque: R${total_geral:.2f}")
+
+def menu():
+    while True:
+        print("\n--- Sistema de Controle de Estoque ---")
+        print("1. Cadastrar produto")
+        print("2. Atualizar estoque de produto")
+        print("3. Consultar produto")
+        print("4. Consultar valor total em estoque")
+        print("5. Sair")
+        
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+            cadastrar_produto()
+        elif opcao == "2":
+            atualizar_estoque()
+        elif opcao == "3":
+            consultar_produto()
+        elif opcao == "4":
+            valor_total_estoque()
+        elif opcao == "5":
+            print("Saindo do sistema...")
+            break
+        else:
+            print("Opção inválida! Tente novamente.")
+
+menu()
